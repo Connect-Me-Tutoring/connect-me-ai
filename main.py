@@ -1,3 +1,5 @@
+from google import genai
+from google.genai import types
 import os
 from groq import Groq, AsyncGroq
 import json
@@ -13,12 +15,15 @@ load_dotenv()
 with open('./data/handbook.json', 'r') as file:
     handbook_data = json.load(file)
 with open('./data/tutorresources.json', 'r') as file:
-    tutor_resources_data = json.load(file);
+    tutor_resources_data = json.load(file)
+with open('./data/Connect-Me-Handbook.md') as file:
+    handbook_data_s6 = file
+with open('./data/Connect-Me-Tutor-Portal-Manual.md') as file:
+    tutor_portal_manual = file
+with open('./data/Tutor-FAQs-Connect-Me.md') as file:
+    tutor_faq = file
 
-client = AsyncGroq(
-    api_key=os.getenv("GROQ_API_KEY"),
-)
-
+client = genai.Client()
 
 class Item(BaseModel):
     message : str
@@ -26,48 +31,56 @@ class Item(BaseModel):
 
 @app.post("/process-message")
 async def read_item(message: Item):
-
     try:
-
-        response = await call_Groq(message.message)
+        response = await call_gemini(message.message)
         return response
-
     except Exception as e:
         print("Read Item Exception")
         raise HTTPException(status_code = 500, detail = f"Error in processing query {e}")
 
 
 # @cached(ttl = 3600)
-async def call_Groq(query : str) -> str:
+async def call_gemini(query : str) -> str:
+    
+    system_instructions = (
+        f'''
+        {handbook_data_s6} {tutor_portal_manual} {tutor_faq} Your are a helpful assistant answering questions based off the data given")
+        Provide as many links as possible. Always provide the CONNECT_ME_HANDBOOK link if necessary to answer the prompt.
+        Keep the response under 2000 characters
+        '''
+    )
+    
     try:
-        chat_completion = await client.chat.completions.create(
-            messages=[
-                {
-                    "role": "system",
-                    "content": f"{handbook_data} {tutor_resources_data} Your are a helpful assistant answering questions based off the data given",
-                },
-                {
-                    "role": "system",
-                    "content": f"Provide links as much as possible",
-                },
-                {
-                    "role":"system",
-                    "content" : "Always provide the CONNECT_ME_HANDBOOK link if necessary to answer the prompt"
-                },
-                {
-                    "role": "system",
-                    "content": "Keep the response under 2000 characters"
-                },
-                {
-                    "role": "user",
-                    "content": f"{query}",
-                },
-            ],
-            model="llama3-8b-8192",
+        response = await client.aio.models.generate_content(
+            model="gemini-2.5-flash",
+            config=types.GenerateContentConfig(
+                system_instruction=system_instructions),
+            contents = f"{query}"
         )
-        return chat_completion.choices[0].message.content
+        
+        return response.text
     except Exception as e:
-        print("GROQ EXCEPTION")
-        raise HTTPException(status_code = 500, detail = f"Error in Groq call {e}")
-        # return "Please wait for a moment before sending another prompt"
+        print("GEMINI EXCEPTION")
+        raise HTTPException(status_code = 500, detail = f"Error in Gemini call {e}")
+    
+    
+async def stream_generator(response: any):
+    async for chunk in response:
+        if chunk.text:
+            yield chunk.text
+            
+            
+async def call_gemini_streaming(query: str, system_instructions: str):
+    try:
+        response = await client.aio.models.generate_content_stream(
+            model="gemini-2.5-flash",
+            config=types.GenerateContentConfig(
+                system_instruction=system_instructions),
+            contents = f"{query}"
+        )
+        
+        return StreamingResponse(stream_generator, media_type="text/plain")
+    except Exception as e:
+        print("GEMINI EXCEPTION")
+        raise HTTPException(status_code = 500, detail = f"Error in Gemini call {e}")
     
