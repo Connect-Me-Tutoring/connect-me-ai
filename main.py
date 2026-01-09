@@ -7,9 +7,16 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import Union
+import asgi
+from worksers import WorkerEntryPoint
+
 
 app = FastAPI()
 load_dotenv()
+
+class Default(workerEntrypoint):
+    async def fetch(self, request):
+        return await asgi.fetch(app, request, self.env)
 
 #Open data
 with open('./data/handbook.json', 'r') as file:

@@ -1,0 +1,7 @@
+{
+    "$schema" : "node_modules/wrangler/config-schema.json",
+    "name" : "connect-me-ai",
+    "main" : "main.py",
+    "compatibility_date" : "2026-01-08",
+    "compatibility_flags" : ["python_workers"]
+}
