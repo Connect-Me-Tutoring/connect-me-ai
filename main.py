@@ -8,15 +8,15 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import Union
 # import asgi
-from workers import WorkerEntryPoint
+# from workers import WorkerEntryPoint
 
 
 app = FastAPI()
 load_dotenv()
 
-class Default(workerEntrypoint):
-    async def fetch(self, request):
-        return await asgi.fetch(app, request, self.env)
+# class Default(workerEntrypoint):
+#     async def fetch(self, request):
+#         return await asgi.fetch(app, request, self.env)
 
 #Open data
 with open('./data/handbook.json', 'r') as file:
@@ -51,9 +51,9 @@ async def call_gemini(query : str) -> str:
     
     system_instructions = (
         f'''
-        {handbook_data_s6} {tutor_portal_manual} {tutor_faq} Your are a helpful assistant answering questions based off the data given")
+        {handbook_data_s6} {tutor_portal_manual} {tutor_faq} Your are a helpful assistant answering questions based off the data given
         Provide as many links as possible. Always provide the CONNECT_ME_HANDBOOK link if necessary to answer the prompt.
-        Keep the response under 2000 characters
+        Keep the response under 2000 characters. RESPOND EMPTY IF THE QUESTION IS NOT RELEVANT TO THE PROVIDED RESOURCES
         '''
     )
     
