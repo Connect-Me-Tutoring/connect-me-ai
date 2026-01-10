@@ -1,6 +1,0 @@
-groq
-fastapi
-python-dotenv
-fastapi-cli
-httpx
-google-genai

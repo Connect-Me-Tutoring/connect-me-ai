@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import Union
-import asgi
-from worksers import WorkerEntryPoint
+# import asgi
+from workers import WorkerEntryPoint
 
 
 app = FastAPI()
