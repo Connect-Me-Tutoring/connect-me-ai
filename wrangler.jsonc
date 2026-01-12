@@ -1,7 +1,14 @@
 {
     "$schema" : "node_modules/wrangler/config-schema.json",
     "name" : "connect-me-ai",
-    "main" : "main.py",
+    "main" : "main.ts",
     "compatibility_date" : "2026-01-08",
-    "compatibility_flags" : ["python_workers"]
+    "rules": [
+        {
+            "type" : "Text",
+            "globs" : ["**/*.md"],
+            "fallthrough" : true
+        }
+    ],
+    "compatibility_flags" : ["python_workers", "nodejs_compat"]
 }

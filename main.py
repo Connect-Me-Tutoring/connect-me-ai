@@ -53,7 +53,7 @@ async def call_gemini(query : str) -> str:
         f'''
         {handbook_data_s6} {tutor_portal_manual} {tutor_faq} Your are a helpful assistant answering questions based off the data given
         Provide as many links as possible. Always provide the CONNECT_ME_HANDBOOK link if necessary to answer the prompt.
-        Keep the response under 2000 characters. RESPOND EMPTY IF THE QUESTION IS NOT RELEVANT TO THE PROVIDED RESOURCES
+        Keep the response under 2000 characters.
         '''
     )
     
