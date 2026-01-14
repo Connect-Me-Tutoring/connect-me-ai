@@ -13,13 +13,14 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "main.ts",
+  "main": "src/main.ts",
   "scripts": {
     "dev": "wrangler dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@google/genai": "^1.35.0",
+    "@mastra/core": "^0.24.9",
     "hono": "^4.11.3",
     "wrangler": "^4.58.0"
   },
