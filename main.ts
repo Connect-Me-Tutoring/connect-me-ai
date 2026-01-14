@@ -41,6 +41,9 @@ const callGemini = async (query: string) => {
       model: "gemini-2.5-flash",
       config: {
         systemInstruction: systemInstructions,
+        thinkingConfig: {
+          thinkingBudget: 0
+        }
       },
       contents: query,
     });
