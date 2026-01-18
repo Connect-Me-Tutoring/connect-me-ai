@@ -8,7 +8,7 @@ const GeneralAgentSystemInstructions = `${handbookS6} ${tutorPortalManual} ${tut
         Provide as many links as possible! Always provide the CONNECT_ME_HANDBOOK link if necessary to answer the prompt
         Keep the response under 2000 characters. RESPOND EMPTY IF NOT RELEVANT`;
 
-export const dmAgent = new Agent({
+export const generalAgent = new Agent({
   name: "general-agent",
   instructions: [
     {
@@ -25,7 +25,7 @@ export const dmAgent = new Agent({
     },
     {
       role: "system",
-      content: "Provide as many links as possible!",
+      content: "Provide any relevant links",
     },
     { role: "system", content: `Keep the response under 2000 characters` },
     { role: "system", content: handbookS6 },
@@ -35,7 +35,7 @@ export const dmAgent = new Agent({
   model: "mistral/ministral-8b-latest",
 });
 
-export const generalAgent = new Agent({
+export const dmAgent = new Agent({
   name: "dm-agent",
   instructions: [
     {
