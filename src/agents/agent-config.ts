@@ -1,12 +1,8 @@
 import { Agent } from "@mastra/core/agent";
-import { TokenLimiterProcessor } from "@mastra/core/processors";
-import tutorFAQ from "../../data/Tutor-FAQs-Connect-Me.md";
-import handbookS6 from "../../data/Connect-Me-Handbook.md";
-import tutorPortalManual from "../../data/Connect-Me-Tutor-Portal-Manual.md";
+import tutorFAQ from "../../context/Tutor-FAQs-Connect-Me.md";
+import handbookS6 from "../../context/Connect-Me-Handbook.md";
+import tutorPortalManual from "../../context/Connect-Me-Tutor-Portal-Manual.md";
 
-const GeneralAgentSystemInstructions = `${handbookS6} ${tutorPortalManual} ${tutorFAQ} Your are a helpful assistant answering questions based off the data given
-        Provide as many links as possible! Always provide the CONNECT_ME_HANDBOOK link if necessary to answer the prompt
-        Keep the response under 2000 characters. RESPOND EMPTY IF NOT RELEVANT`;
 
 export const generalAgent = new Agent({
   name: "general-agent",
@@ -38,14 +34,14 @@ export const generalAgent = new Agent({
 export const dmAgent = new Agent({
   name: "dm-agent",
   instructions: [
+    { role: "system", content: `Keep the response under 2000 characters` },
     {
       role: "system",
-      content: `Your are a helpful assistant answering questions based off the data given`,
+      content: `Your are a helpful assistant answering questions based off the context given`,
     },
-    { role: "system", content: `Keep the response under 2000 characters` },
     { role: "system", content: handbookS6 },
     { role: "system", content: tutorPortalManual },
     { role: "system", content: tutorFAQ },
   ],
-  model: "mistral/ministral-8b-latest",
+  model: "mistral/mistral-small-latest",
 });
