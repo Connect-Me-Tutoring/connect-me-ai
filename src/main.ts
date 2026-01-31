@@ -18,8 +18,19 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-app.use("/process-*", async (c, next) => {
-  const auth = bearerAuth({ token: c.env.API_TOKEN});
+app.use("*", async (c, next) => {
+  if (!c.req.path.startsWith("/process-")) {
+    return next();
+  }
+
+  const token = c.env?.API_TOKEN || process.env.API_TOKEN;
+  
+  if (!token) {
+    console.error("No API_TOKEN found in c.env or process.env");
+    return c.text("Configuration Error", 500);
+  }
+
+  const auth = bearerAuth({ token });
   return auth(c, next);
 });
 
@@ -50,8 +61,3 @@ app.post("/process-general", async (c) => {
 });
 
 export default app;
-    
-// export default {
-//   port: 1234,
-//   fetch: app.fetch,
-// };
