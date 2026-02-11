@@ -3,39 +3,54 @@ import { dmAgent, generalAgent } from "./agents/agent-config";
 
 const app = new Hono();
 
-app.get("/", async (c) => {
-  return c.text("Hono App Is Working");
-});
+app.get("/", (c) => c.text("Hono App Is Working v3"));
 
 app.post("/process-dm", async (c) => {
-  const body = await c.req.json();
-  try {
-    const response = await callDmAgent(body.message);
-    return response ? c.text(response) : c.text("No response");
-  } catch (error) {
-    console.error("Read Item Exception", error);
+  const body = await c.req.json<{ message?: string }>();
+  const message = body.message?.trim();
+
+  if (!message) {
+    return c.text("Missing message in body", 400);
   }
+
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        const result = await dmAgent.stream(message);
+
+        if (
+          !result?.textStream ||
+          typeof result.textStream[Symbol.asyncIterator] !== "function"
+        ) {
+          throw new Error("Agent does not support streaming output");
+        }
+
+        for await (const chunk of result.textStream) {
+          if (chunk !== null && chunk !== undefined) {
+            controller.enqueue(
+              encoder.encode(`data: ${String(chunk)}\n\n`)
+            );
+          }
+        }
+      } catch (err: any) {
+        controller.enqueue(
+          encoder.encode(`data: Error: ${err?.message ?? "Error"}\n\n`)
+        );
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return c.newResponse(stream, {
+    headers: {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "Connection": "keep-alive",
+    },
+  });
 });
-
-app.post("/process-general", async (c) => {
-  const body = await c.req.json();
-  try {
-    const response = await callGeneralAgent(body.message);
-    return response ? c.text(response) : c.text("No response");
-  } catch (error) {
-    console.error("Read Item Exception", error);
-    throw error;
-  }
-});
-
-const callGeneralAgent = async (query: string) => {
-  const response = await generalAgent.generate(query);
-  return response.text;
-};
-
-const callDmAgent = async (query: string) => {
-  const response = await dmAgent.generate(query)
-  return response.text
-}
 
 export default app;
