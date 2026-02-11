@@ -44,7 +44,7 @@ app.post("/process-dm", async (c) => {
     },
   });
 
-  return c.newResponse(stream, {
+  return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
