@@ -29,14 +29,12 @@ app.post("/process-dm", async (c) => {
 
         for await (const chunk of result.textStream) {
           if (chunk !== null && chunk !== undefined) {
-            controller.enqueue(
-              encoder.encode(`data: ${String(chunk)}\n\n`)
-            );
+            controller.enqueue(encoder.encode(`data: ${String(chunk)}\n\n`));
           }
         }
       } catch (err: any) {
         controller.enqueue(
-          encoder.encode(`data: Error: ${err?.message ?? "Error"}\n\n`)
+          encoder.encode(`data: Error: ${err?.message ?? "Error"}\n\n`),
         );
       } finally {
         controller.close();
@@ -48,7 +46,7 @@ app.post("/process-dm", async (c) => {
     headers: {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     },
   });
 });
